@@ -45,3 +45,10 @@ a
     text-decoration: none;
     color: white;
 }
+
+main 
+{
+    width: 80%;
+    margin: 0% auto 0% auto;
+    background-color: gold;
+}
