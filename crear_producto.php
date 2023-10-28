@@ -8,17 +8,17 @@
     {
 
         // Validación del nombre.
+        if
         (
             !isset($_REQUEST['nombre'])
             ||
             empty($_REQUEST['nombre'])
         )
-            ?
-                $datosErroneos[] = "El campo nombre contiene un error ❌"
-            :
-                null;
+            $datosErroneos[] = "El campo nombre contiene un error ❌";
+
 
         // Validación del precio.
+        if
         (
             !isset($_REQUEST['precio'])
             ||
@@ -28,10 +28,7 @@
             ||
             $_REQUEST['precio'] <= 0
         )
-            ?
-                $datosErroneos[] = "El campo precio contiene un error ❌"
-            :
-                null;
+            $datosErroneos[] = "El campo precio contiene un error ❌";
 
         // Validación de la imagen.
         $_photoName      = $_FILES['imagen']['name'];     
