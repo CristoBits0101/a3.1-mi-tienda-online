@@ -149,7 +149,7 @@ td img
 
 td img a 
 {
-    max-width: 100px;
+    max-width: 50px;
 }
 
 tbody tr:nth-child(even) 

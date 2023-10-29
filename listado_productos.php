@@ -69,12 +69,12 @@
                                         echo '<td>' . $row['Categoría'] . '</td>';
                                         echo '<td>
                                                 <a href="edita_producto.php?id=' . $row['id'] . '">
-                                                    <img src="" alt="Editar" />
+                                                    <img src=".\\iconos\\editar.svg" alt="Editar" />
                                                 </a>
                                             </td>';
                                         echo '<td>
                                                 <a href="elimina_producto.php?id=' . $row['id'] . '">
-                                                    <img src="" alt="Eliminar">
+                                                    <img src=".\\iconos\\eliminar.svg" alt="Eliminar">
                                                 </a>
                                             </td>';
                                     echo '</tr>';
