@@ -2,7 +2,7 @@
 
     // Paso 1) Importamos el archivo de configuración para poder conectarnos a la base de datos.
     require_once "./configuration.php";
-
+    
     // Paso 2) Inicializa la variable $datosErroneos para evitar errores.
     $datosErroneos = array();
 
@@ -35,13 +35,12 @@
         }
 
         // 4.5) Validación de la categoría.
-        if (!isset($_POST['categoria']) || empty($_POST['categoria'])) $datosErroneos[] = "❌ El campo categoría contiene un error.";
+        if (!isset($_POST['categoria']) || empty($_POST['categoria']) || !is_numeric($_POST['categoria'])) $datosErroneos[] = "❌ El campo categoría contiene un error.";
 
         // 4.6) Si no hay datos erróneos, almacenamos los datos y se lo comunicamos al usuario.
         if (empty($datosErroneos)) 
         {
-            store_imagen(); 
-            save_to_database(); 
+            save_data(); 
             echo "<script> alert('¡Datos almacenados correctamente!') </script>";
         }
 
@@ -61,13 +60,63 @@
     // Función almacena la imagen.
     function store_imagen()
     {
-        
+        $target_dir = "ficheros\\";                                        // Directorio donde se van a guardar las imágenes.
+        $target_file = $target_dir . basename($_FILES["imagen"]["name"]);   // basename devuelve el nombre de la imagen sin el directorio.
+
+        $counter = 0;                                                       // Incrementa el nombre de la imagen.
+
+        while (file_exists($target_file)) 
+        {
+            $counter++;                                                     // Si la imagen existe, aumentar el valor de counter en 1.
+
+            $pathinfo = pathinfo($target_file);                             // Obtener la información sobre la imagen.
+
+            $name = $pathinfo["filename"];                                  // Obtener el nombre de la imagen.
+            $extension = $pathinfo["extension"];                            // Obtener la extesión de la imagen.
+    
+            $target_file =  $target_dir                                     // Directorio donde se van a guardar las imagenes.
+                            . 
+                            $name                                           // Nombre de la imagen.
+                            . 
+                            "_"                                             // Añadimos la barra baja para concatenar el número incremental.
+                            . 
+                            $counter                                        // Concatenamos el contador para diferenciar la nueva imagen de la vieja.
+                            .
+                            "."
+                            .
+                            $extension;                                     // Extensión de la imagen.
+        }
+
+        move_uploaded_file($_FILES["imagen"]["tmp_name"], $target_file);    // Movemos la imagen de la ruta temporal a la ruta de destino.
+
+        return basename($target_file);                                      // Devuelve el nombre de archivo de la imagen almacenada.
     }
 
     // Función intenta conectarse a la base de datos para almacenar los datos nuevos.
-    function save_to_database()
+    function save_data()
     {
+        try
+        {
+            // Almacena la imagen y obtiene su nombre de archivo.
+            $imagePath = store_imagen();
 
+            // Establece la conexión a la base de datos.
+            $conn = connect_to_database();
+
+            // Inserta datos en la base de datos.
+            $stmt = $conn->prepare("INSERT INTO productos (Nombre, Precio, Imagen, Categoría) VALUES (:nombre, :precio, :imagen, :categoria)");
+            $stmt->bindParam(':nombre', $_POST['nombre']);
+            $stmt->bindParam(':precio', $_POST['precio']);
+            $stmt->bindParam(':imagen', $imagePath);
+            $stmt->bindParam(':categoria', $_POST['categoria']);
+            $stmt->execute();
+
+            echo "¡Datos almacenados correctamente!";
+        }
+        catch(PDOException $e)
+        {
+            echo "Error al insertar datos: " . $e->getMessage();
+        }
     }
 
 ?>
@@ -126,9 +175,16 @@
                     <br/>
 
                     <div class="inputs">
-                        <label for="categoria">Categoría:</label>
-                        <br/>
-                        <input type="text" id="categoria" name="categoria">
+                        <p style="margin: 0 0 0.2rem 0 ;"><b>Categoría:</b></p>
+                        <select name="categoria" id="categoria">
+                            <option value="1">Alimentación</option>
+                            <option value="2">Entretenimiento</option>
+                            <option value="3">Deportes</option>
+                            <option value="4">Electrodomésticos</option>
+                            <option value="5">Ferretería</option>
+                            <option value="6">Decoración</option>
+                            <option value="7">Muebles</option>
+                        </select>
                     </div>
 
                     <br/>
