@@ -147,11 +147,6 @@ td img
     max-width: 100px;
 }
 
-td img a 
-{
-    max-width: 50px;
-}
-
 tbody tr:nth-child(even) 
 {
     background-color: #f9f9f9;
