@@ -111,3 +111,56 @@ input
     color: #fff;
     font-weight: bold;
 }
+
+#listado-productos 
+{
+    display: flex;
+    justify-content: center;
+}
+
+table 
+{
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+thead 
+{
+    background-color: #f0f0f0;
+    color:royalblue
+}
+
+thead th 
+{
+    padding: 10px;
+}
+
+td 
+{
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+td img 
+{
+    max-width: 100px;
+}
+
+td img a 
+{
+    max-width: 100px;
+}
+
+tbody tr:nth-child(even) 
+{
+    background-color: #f9f9f9;
+}
+
+caption 
+{
+    padding: 1rem 0rem;
+    text-transform: uppercase; 
+    color: red; 
+    font-family: sans-serif";
+}
