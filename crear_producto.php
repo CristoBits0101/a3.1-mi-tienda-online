@@ -103,12 +103,16 @@
             // Establece la conexión a la base de datos.
             $conn = connect_to_database();
 
-            // Inserta datos en la base de datos.
+            // Establecemos una consulta preparada para insertar datos en la tabla 'productos'.
             $stmt = $conn->prepare("INSERT INTO productos (Nombre, Precio, Imagen, Categoría) VALUES (:nombre, :precio, :imagen, :categoria)");
-            $stmt->bindParam(':nombre', $_POST['nombre']);
+
+            // Los marcadores de parámetros como :nombre, :precio, :imagen y :categoria se utilizan en lugar de valores directos para evitar la inyección SQL.
+            $stmt->bindParam(':nombre', $_POST['nombre']);         
             $stmt->bindParam(':precio', $_POST['precio']);
             $stmt->bindParam(':imagen', $imagePath);
             $stmt->bindParam(':categoria', $_POST['categoria']);
+
+            // Ejecutamos la consulta preparada para insertar los datos en la base de datos. Los valores vinculados a los marcadores de parámetros se utilizarán en la consulta.
             $stmt->execute();
 
             echo "¡Datos almacenados correctamente!";
