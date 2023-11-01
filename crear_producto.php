@@ -173,7 +173,7 @@
                     <div class="inputs">
                         <label for="imagen">Imagen:</label>
                         <br/>
-                        <input type="file" id="imagen" name="imagen" accept=".jpg,.png,.gif,.jfif">
+                        <input type="file" id="imagen" name="imagen" accept=".jpg,.png,.gif,.jfif" />
                     </div>
 
                     <br/>
@@ -181,13 +181,36 @@
                     <div class="inputs">
                         <p style="margin: 0 0 0.2rem 0 ;"><b>Categoría:</b></p>
                         <select name="categoria" id="categoria">
-                            <option value="1">Alimentación</option>
-                            <option value="2">Entretenimiento</option>
-                            <option value="3">Deportes</option>
-                            <option value="4">Electrodomésticos</option>
-                            <option value="5">Ferretería</option>
-                            <option value="6">Decoración</option>
-                            <option value="7">Muebles</option>
+                            <?php
+                                // Paso 1) Realizamos una conexión a la base de datos.
+                                $connection = connect_to_database();
+
+                                // Paso 2) Guardamos la consulta en la variable sql.
+                                $sql_query = "SELECT id, nombre FROM Categorías";
+
+                                // Paso 3) Ejecutamos la consulta dentro de la conexión.
+                                $stmt = $connection->query($sql_query);
+
+                                // Paso 4) Comprobamos que la consulta se realizó correctamente.
+                                if ($stmt)
+                                {
+                                    /**
+                                     *  - Cada vuelta fetch usa la conexión para retornar un registro de la tabla categorías en un array.
+                                     *  - Este array se almacena en la variable row.
+                                     */
+                                    while ($row = $stmt->fetch())
+                                    {
+                                        // Imprimimos los valores del array.
+                                        echo '<option value="' . $row['id'] . '">' . $row['nombre'] . '</option>';
+                                    }
+                                }
+                                
+                                else
+                                {
+                                    // En caso de no poder mostrar las categorías lo indicamos.
+                                    echo '<option value="null">Las categorías no están disponibles</option>';
+                                }
+                            ?>
                         </select>
                     </div>
 

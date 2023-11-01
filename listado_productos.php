@@ -31,7 +31,7 @@
                 <table>
 
                     <!-- Asignamos un título a la tabla -->
-                    <caption>Listado de Productos</caption>
+                    <caption><b>Listado de Productos</b></caption>
 
                     <!-- Añadimos el encabezado estático de la tabla -->
                     <thead>
@@ -56,9 +56,9 @@
                             $sql = "SELECT * FROM productos";
                             $stmt = $conn->query($sql);
 
-                            if ($stmt) 
+                            if ($stmt)
                             {
-                                while ($row = $stmt->fetch()) 
+                                while ($row = $stmt->fetch())
                                 {
                                     echo '<tr>';
                                         echo '<td>' . $row['Nombre'] . '</td>';
