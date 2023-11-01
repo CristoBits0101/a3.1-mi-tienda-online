@@ -21,7 +21,7 @@
 
             <!-- Incluye el menú dentro de la aplicación -->
             <?php
-                include_once "./index.php";
+                include_once "./menu.php";
             ?>
 
             <!-- Aquí va el cuerpo del contenido -->
