@@ -48,42 +48,45 @@
                     <!-- Añadimos el cuerpo de la tabla de forma dinámica -->
                     <tbody>
                         <?php
-
                             // Establece la conexión a la base de datos.
                             $conn = connect_to_database();
 
-                            // Realiza una consulta SQL para obtener los datos de la tabla 'productos'.
-                            $sql = "SELECT * FROM productos";
+                            // Realiza una consulta SQL para obtener los datos de la tabla 'productos' con un JOIN en 'Categorías'.
+                            $sql = "SELECT     
+                                        productos.Nombre, 
+                                        productos.Precio, 
+                                        productos.Imagen, 
+                                        Categorías.nombre 
+                                    AS         
+                                        CategoriaNombre, 
+                                        productos.id 
+                                    FROM       
+                                        productos 
+                                    INNER JOIN 
+                                        Categorías 
+                                    ON         
+                                        productos.Categoría = Categorías.id";
+
                             $stmt = $conn->query($sql);
 
-                            if ($stmt)
+                            if ($stmt) 
                             {
-                                while ($row = $stmt->fetch())
+                                while ($row = $stmt->fetch()) 
                                 {
                                     echo '<tr>';
-                                        echo '<td>' . $row['Nombre'] . '</td>';
-                                        echo '<td>' . $row['Precio'] . '</td>';
-                                        echo '<td>
-                                                <img src=".\\ficheros\\' . $row['Imagen'] . '" alt="Imagen del producto" width="100" />
-                                            </td>';
-                                        echo '<td>' . $row['Categoría'] . '</td>';
-                                        echo '<td>
-                                                <a href="edita_producto.php?id=' . $row['id'] . '">
-                                                    <img src=".\\iconos\\editar.svg" alt="Editar" />
-                                                </a>
-                                            </td>';
-                                        echo '<td>
-                                                <a href="elimina_producto.php?id=' . $row['id'] . '">
-                                                    <img src=".\\iconos\\eliminar.svg" alt="Eliminar">
-                                                </a>
-                                            </td>';
+                                        echo '<td>'                                 . $row['Nombre']          .                                                         '</td>';
+                                        echo '<td>'                                 . $row['Precio']          .                                                         '</td>';
+                                        echo '<td><img src=".\\ficheros\\'          . $row['Imagen']          . '" alt="Imagen del producto" width="100" />              </td>';
+                                        echo '<td>'                                 . $row['CategoriaNombre'] .                                                         '</td>';
+                                        echo '<td><a href="edita_producto.php?id='  . $row['id']              . '"><img src=".\\iconos\\editar.svg" alt="Editar" /></a>  </td>';
+                                        echo '<td><a href="elimina_producto.php?id='. $row['id']              . '"><img src=".\\iconos\\eliminar.svg" alt="Eliminar"></a></td>';
                                     echo '</tr>';
                                 }
                             }
                             
                             else
                             {
-                                echo '<tr><td colspan="4">No se pudieron recuperar los datos.</td></tr>';
+                                echo '<tr><td colspan="4">No se pudieron recuperar los datos de los productos.</td></tr>';
                             }
                         ?>
                     </tbody>
