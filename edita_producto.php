@@ -118,7 +118,7 @@
 
             echo "¡Datos actualizados correctamente!";
         }
-        
+
         catch(PDOException $e)
         {
             echo "Error al actualizar datos: " . $e->getMessage();
@@ -282,6 +282,8 @@
                                                     </div>
 
                                                     <br/>
+
+                                                    <input type="hidden" name="producto_id" value="' . $producto_id . '">
 
                                                     <button type="submit">Envíar</button>
 
