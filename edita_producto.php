@@ -107,11 +107,12 @@
             $stmt = $conn->prepare("UPDATE productos SET Nombre = :nombre, Precio = :precio, Imagen = :imagen, Categoría = :categoria WHERE id = :producto_id");
 
             // Los marcadores de parámetros como :nombre, :precio, :imagen y :categoria se utilizan en lugar de valores directos para evitar la inyección SQL.
+            // Utilizamos el id recibido por URL para identificar el producto.
             $stmt->bindParam(':nombre', $_POST['nombre']);
             $stmt->bindParam(':precio', $_POST['precio']);
             $stmt->bindParam(':imagen', $imagePath);
             $stmt->bindParam(':categoria', $_POST['categoria']);
-            $stmt->bindParam(':producto_id', $_GET['id']); // Utilizamos el id recibido por URL para identificar el producto.
+            $stmt->bindParam(':producto_id', $_POST['producto_id']);     
 
             // Ejecutamos la consulta preparada para realizar la actualización.
             $stmt->execute();
