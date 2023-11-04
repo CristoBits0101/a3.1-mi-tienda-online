@@ -117,6 +117,7 @@
 
             echo "¡Datos almacenados correctamente!";
         }
+        
         catch(PDOException $e)
         {
             echo "Error al insertar datos: " . $e->getMessage();

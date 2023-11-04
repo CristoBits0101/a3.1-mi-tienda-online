@@ -1,6 +1,130 @@
 <?php
+
     // Paso 1) Importamos el archivo de configuración para poder conectarnos a la base de datos.
     require_once "./configuration.php";
+    
+    // Paso 2) Inicializa la variable $datosErroneos para evitar errores.
+    $datosErroneos = array();
+
+    // Paso 3) Detecta el envío de datos y llama a las validaciones.
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') validations();
+
+    // Función de validación.
+    function validations()
+    {
+        // 4.1) Validación del nombre.
+        if (!isset($_POST['nombre']) || empty($_POST['nombre'])) $datosErroneos[] = "❌ El campo nombre contiene un error.";
+
+        // 4.2) Validación del precio.
+        if (!isset($_POST['precio']) || empty($_POST['precio']) || !is_numeric($_POST['precio']) || $_POST['precio'] <= 0) $datosErroneos[] = "❌ El campo precio contiene un error.";
+
+        // 4.3) Validación de la imagen.
+        if (!isset($_FILES['imagen']) || empty($_FILES['imagen']['name'])) $datosErroneos[] = "❌ El campo imagen contiene un error.";
+
+        // 4.4) Validación del formato.
+        else
+        {
+            $_photoName = $_FILES['imagen']['name'];
+            $_photoError = $_FILES['imagen']['error'];
+            $_photoSize = $_FILES['imagen']['size'];
+            $_photoMaxSize = 1024 * 1024 * 1;
+            $_photoExtension = pathinfo($_photoName, PATHINFO_EXTENSION);
+            $_photoFormats = array('jpg', 'png', 'gif', 'jfif');
+
+            if ($_photoError === true || $_photoSize > $_photoMaxSize || $_photoSize < 1 || !in_array($_photoExtension, $_photoFormats)) $datosErroneos[] = "❌ El formato de la imagen contiene un error.";
+        }
+
+        // 4.5) Validación de la categoría.
+        if (!isset($_POST['categoria']) || empty($_POST['categoria']) || !is_numeric($_POST['categoria'])) $datosErroneos[] = "❌ El campo categoría contiene un error.";
+
+        // 4.6) Si no hay datos erróneos, almacenamos los datos y se lo comunicamos al usuario.
+        if (empty($datosErroneos)) 
+        {
+            save_data(); 
+            echo "<script> alert('¡Datos almacenados correctamente!') </script>";
+        }
+
+        // 4.7) Si hubo errores, los mostramos y facilitamos un enlace para volver a rellenar el formulario.
+        elseif (!empty($datosErroneos))
+        {
+            echo '<div id="mensajes">';
+
+                foreach ($datosErroneos as $value) {echo "<p>$value</p> <br/>";}
+
+                echo '<a href="./crear_producto.php">Volver a rellenar formulario</a>';
+
+            echo '</div>';
+        }
+    }
+
+    // Función almacena la imagen.
+    function store_imagen()
+    {
+        $target_dir = "ficheros\\";                                        // Directorio donde se van a guardar las imágenes.
+        $target_file = $target_dir . basename($_FILES["imagen"]["name"]);   // basename devuelve el nombre de la imagen sin el directorio.
+
+        $counter = 0;                                                       // Incrementa el nombre de la imagen.
+
+        while (file_exists($target_file)) 
+        {
+            $counter++;                                                     // Si la imagen existe, aumentar el valor de counter en 1.
+
+            $pathinfo = pathinfo($target_file);                             // Obtener la información sobre la imagen.
+
+            $name = $pathinfo["filename"];                                  // Obtener el nombre de la imagen.
+            $extension = $pathinfo["extension"];                            // Obtener la extesión de la imagen.
+    
+            $target_file =  $target_dir                                     // Directorio donde se van a guardar las imagenes.
+                            . 
+                            $name                                           // Nombre de la imagen.
+                            . 
+                            "_"                                             // Añadimos la barra baja para concatenar el número incremental.
+                            . 
+                            $counter                                        // Concatenamos el contador para diferenciar la nueva imagen de la vieja.
+                            .
+                            "."
+                            .
+                            $extension;                                     // Extensión de la imagen.
+        }
+
+        move_uploaded_file($_FILES["imagen"]["tmp_name"], $target_file);    // Movemos la imagen de la ruta temporal a la ruta de destino.
+
+        return basename($target_file);                                      // Devuelve el nombre de archivo de la imagen almacenada.
+    }
+
+    // Función intenta conectarse a la base de datos para actualizar los datos existentes.
+    function save_data()
+    {
+        try
+        {
+            // Almacena la imagen y obtiene su nombre de archivo.
+            $imagePath = store_imagen();
+
+            // Establece la conexión a la base de datos.
+            $conn = connect_to_database();
+
+            // Modificamos la consulta para realizar una actualización (UPDATE) en lugar de una inserción (INSERT).
+            $stmt = $conn->prepare("UPDATE productos SET Nombre = :nombre, Precio = :precio, Imagen = :imagen, Categoría = :categoria WHERE id = :producto_id");
+
+            // Los marcadores de parámetros como :nombre, :precio, :imagen y :categoria se utilizan en lugar de valores directos para evitar la inyección SQL.
+            $stmt->bindParam(':nombre', $_POST['nombre']);
+            $stmt->bindParam(':precio', $_POST['precio']);
+            $stmt->bindParam(':imagen', $imagePath);
+            $stmt->bindParam(':categoria', $_POST['categoria']);
+            $stmt->bindParam(':producto_id', $_GET['id']); // Utilizamos el id recibido por URL para identificar el producto.
+
+            // Ejecutamos la consulta preparada para realizar la actualización.
+            $stmt->execute();
+
+            echo "¡Datos actualizados correctamente!";
+        }
+        
+        catch(PDOException $e)
+        {
+            echo "Error al actualizar datos: " . $e->getMessage();
+        }
+    }
+
 ?>
 
 <!DOCTYPE html>
@@ -187,5 +311,4 @@
             </main>
         </div>
     </body>
-
 </html>

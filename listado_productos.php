@@ -2,6 +2,7 @@
     // Paso 1) Importamos el archivo de configuración para poder conectarnos a la base de datos.
     require_once "./configuration.php";
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
