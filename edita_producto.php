@@ -60,7 +60,7 @@
     // Función almacena la imagen.
     function store_imagen()
     {
-        $target_dir = "ficheros\\";                                        // Directorio donde se van a guardar las imágenes.
+        $target_dir = "ficheros\\";                                         // Directorio donde se van a guardar las imágenes.
         $target_file = $target_dir . basename($_FILES["imagen"]["name"]);   // basename devuelve el nombre de la imagen sin el directorio.
 
         $counter = 0;                                                       // Incrementa el nombre de la imagen.
