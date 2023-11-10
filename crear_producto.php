@@ -40,7 +40,7 @@
         // 4.6) Si no hay datos erróneos, almacenamos los datos y se lo comunicamos al usuario.
         if (empty($datosErroneos)) 
         {
-            save_data(); 
+            save_data();
             echo "<script> alert('¡Datos almacenados correctamente!') </script>";
         }
 
@@ -114,8 +114,6 @@
 
             // Ejecutamos la consulta preparada para insertar los datos en la base de datos. Los valores vinculados a los marcadores de parámetros se utilizarán en la consulta.
             $stmt->execute();
-
-            echo "¡Datos almacenados correctamente!";
         }
         
         catch(PDOException $e)
