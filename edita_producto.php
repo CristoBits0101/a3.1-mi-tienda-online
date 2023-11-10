@@ -2,7 +2,7 @@
 
     // Paso 1) Importamos el archivo de configuración para poder conectarnos a la base de datos.
     require_once "./configuration.php";
-    
+
     // Paso 2) Inicializa la variable $datosErroneos para evitar errores.
     $datosErroneos = array();
 
@@ -22,7 +22,7 @@
         if (!isset($_FILES['imagen']) || empty($_FILES['imagen']['name'])) $datosErroneos[] = "❌ El campo imagen contiene un error.";
 
         // 4.4) Validación del formato.
-        else
+        else 
         {
             $_photoName = $_FILES['imagen']['name'];
             $_photoError = $_FILES['imagen']['error'];
@@ -40,18 +40,21 @@
         // 4.6) Si no hay datos erróneos, almacenamos los datos y se lo comunicamos al usuario.
         if (empty($datosErroneos)) 
         {
-            save_data(); 
+            save_data();
             echo "<script> alert('¡Datos almacenados correctamente!') </script>";
         }
 
         // 4.7) Si hubo errores, los mostramos y facilitamos un enlace para volver a rellenar el formulario.
-        elseif (!empty($datosErroneos))
+        elseif (!empty($datosErroneos)) 
         {
             echo '<div id="mensajes">';
 
-                foreach ($datosErroneos as $value) {echo "<p>$value</p> <br/>";}
+            foreach ($datosErroneos as $value) 
+            {
+                echo "<p>$value</p> <br/>";
+            }
 
-                echo '<a href="./crear_producto.php">Volver a rellenar formulario</a>';
+            echo '<a href="./crear_producto.php">Volver a rellenar formulario</a>';
 
             echo '</div>';
         }
@@ -73,18 +76,19 @@
 
             $name = $pathinfo["filename"];                                  // Obtener el nombre de la imagen.
             $extension = $pathinfo["extension"];                            // Obtener la extesión de la imagen.
-    
-            $target_file =  $target_dir                                     // Directorio donde se van a guardar las imagenes.
-                            . 
-                            $name                                           // Nombre de la imagen.
-                            . 
-                            "_"                                             // Añadimos la barra baja para concatenar el número incremental.
-                            . 
-                            $counter                                        // Concatenamos el contador para diferenciar la nueva imagen de la vieja.
-                            .
-                            "."
-                            .
-                            $extension;                                     // Extensión de la imagen.
+
+            $target_file =  
+                $target_dir                                                 // Directorio donde se van a guardar las imagenes.
+                .
+                $name                                                       // Nombre de la imagen.
+                .
+                "_"                                                         // Añadimos la barra baja para concatenar el número incremental.
+                .
+                $counter                                                    // Concatenamos el contador para diferenciar la nueva imagen de la vieja.
+                .
+                "."
+                .
+                $extension;                                                 // Extensión de la imagen.
         }
 
         move_uploaded_file($_FILES["imagen"]["tmp_name"], $target_file);    // Movemos la imagen de la ruta temporal a la ruta de destino.
@@ -95,7 +99,7 @@
     // Función intenta conectarse a la base de datos para actualizar los datos existentes.
     function save_data()
     {
-        try
+        try 
         {
             // Almacena la imagen y obtiene su nombre de archivo.
             $imagePath = store_imagen();
@@ -112,15 +116,13 @@
             $stmt->bindParam(':precio', $_POST['precio']);
             $stmt->bindParam(':imagen', $imagePath);
             $stmt->bindParam(':categoria', $_POST['categoria']);
-            $stmt->bindParam(':producto_id', $_POST['producto_id']);     
+            $stmt->bindParam(':producto_id', $_POST['producto_id']);
 
             // Ejecutamos la consulta preparada para realizar la actualización.
             $stmt->execute();
-
-            echo "¡Datos actualizados correctamente!";
-        }
-
-        catch(PDOException $e)
+        } 
+        
+        catch (PDOException $e) 
         {
             echo "Error al actualizar datos: " . $e->getMessage();
         }
@@ -150,168 +152,149 @@
 
             <!-- Aquí va el cuerpo del contenido -->
             <main>
+                <?php
 
-                <!-- Creamos la tabla que va a almacenar la consulta -->
-                <table>
+                    // Comprobamos la variable id.
+                    if (isset($_GET['id']) && !empty($_GET['id']) && is_numeric($_GET['id'])) 
+                    {
+                        $select_product = "SELECT productos.Nombre, productos.Precio, productos.Imagen, Categorías.nombre AS CategoriaNombre, productos.id FROM productos INNER JOIN Categorías ON productos.Categoría = Categorías.id WHERE productos.id = :id";
 
-                    <!-- Asignamos un título a la tabla -->
-                    <caption><b>EDITA EL SIGUIENTE PRODUCTO</b></caption>
+                        $producto_id = $_GET['id'];                 // Almacenamos el id del producto.
+                        $conn = connect_to_database();              // Iniciamos una conexión a la base de datos.
+                        $stmt = $conn->prepare($select_product);    // Preparamos la consulta que vamos a ejecutar.
+                        $stmt->bindParam(':id', $producto_id);      // Vinculamos al :id de la consulta el id del producto recibido.
+                        $stmt->execute();                           // Ejecutamos la consulta.
 
-                    <!-- Añadimos el encabezado estático de la tabla -->
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Precio</th>
-                            <th>Imagen</th>
-                            <th>Categoría</th>
-                        </tr>
-                    </thead>
+                        // Comprobamos si la consulta fue exitosa.
+                        if ($stmt) 
+                        {
+                            // Obtenemos los datos del registro.
+                            $row = $stmt->fetch();
 
-                    <!-- Añadimos el cuerpo de la tabla de forma dinámica -->
-                    <tbody>
-                        <?php
-
-                            // Comprobamos la variable id.
-                            if (isset($_GET['id']) && !empty($_GET['id']) && is_numeric($_GET['id'])) 
+                            // Si se obtuvieron los datos del registro correctamente los mostramos.
+                            if ($row) 
                             {
-                                // Almacenamos el id del producto.
-                                $producto_id = $_GET['id'];
+                                // Mostrar el formulario con los datos del producto
+                                echo '<form action="' . $_SERVER['PHP_SELF'] . '" method="post" enctype="multipart/form-data">';
+                                echo '
+                                        <div class="inputs">
+                                            <label for="nombre">Nombre:</label>
+                                            <br/>
+                                            <input type="text" id="nombre" name="nombre" value="' . $row['Nombre'] . '">
+                                        </div>';
 
-                                // Iniciamos una conexión a la base de datos.
-                                $conn = connect_to_database();
+                                echo '  <br/>';
 
-                                // Guardamos la consulta que queremos realizar en la variable select_product.
-                                $select_product = " SELECT 
-                                                        productos.Nombre, 
-                                                        productos.Precio, 
-                                                        productos.Imagen, 
-                                                        Categorías.nombre 
-                                                    AS 
-                                                        CategoriaNombre, 
-                                                        productos.id 
-                                                    FROM 
-                                                        productos 
-                                                    INNER JOIN 
-                                                        Categorías 
-                                                    ON 
-                                                        productos.Categoría = Categorías.id
-                                                    WHERE 
-                                                        productos.id = :id";
+                                echo '      
+                                        <div class="inputs">
+                                            <label for="precio">Precio:</label>
+                                            <br/>
+                                            <input type="number" id="precio" name="precio" value="' . $row['Precio'] . '">
+                                        </div>';
 
-                                $stmt = $conn->prepare($select_product);    // Preparamos la consulta que vamos a ejecutar.
-                                $stmt->bindParam(':id', $producto_id);      // Vinculamos al :id de la consulta el id del producto recibido.
-                                $stmt->execute();                           // Ejecutamos la consulta.
+                                echo '  <br/>';
 
-                                // Comprobamos si la consulta fue exitosa.
-                                if ($stmt)
-                                {
-                                    // Obtenemos los datos del registro.
-                                    $row = $stmt->fetch();
+                                echo '      
+                                        <div class="inputs">
+                                            <label for="imagen">Imagen:</label>
+                                            <br/>
+                                            <input type="file" id="imagen" name="imagen" accept=".jpg,.png,.gif,.jfif" />
+                                        </div>';
 
-                                    // Si se obtuvieron los datos del registro correctamente los mostramos.
-                                    if ($row) 
-                                    {
-                                        echo '<tr>';
-                                            echo '<td>'                         . $row['Nombre']            .                                           '</td>';
-                                            echo '<td>'                         . $row['Precio']            .                                           '</td>';
-                                            echo '<td><img src=".\\ficheros\\'  . $row['Imagen']            . '" alt="Imagen del producto" width="100" /></td>';
-                                            echo '<td>'                         . $row['CategoriaNombre']   .                                           '</td>';
-                                        echo '</tr>';
+                                echo '  <br/>';
 
-                                        echo '  <form action="' . $_SERVER['PHP_SELF'] . '" method="post" enctype="multipart/form-data">';
-                                        echo '      <div class="inputs">
-                                                        <label for="nombre">Nombre:</label>
+                                echo '
+                                        <div class="inputs">
+                                            <p style="margin: 0 0 0.2rem 0 ;"><b>Categoría:</b></p>
+                                            <select name="categoria" id="categoria">';
 
-                                                        <br/>
+                                                // Paso 1) Realizamos una conexión a la base de datos.
+                                                $connection = connect_to_database();
 
-                                                        <input type="text" id="nombre" name="nombre">
-                                                    </div>';
+                                                // Paso 2) Guardamos la consulta en la variable sql.
+                                                $sql_query = "SELECT id, nombre FROM Categorías";
 
-                                        echo '      <br/>';
+                                                // Paso 3) Ejecutamos la consulta dentro de la conexión.
+                                                $stmt = $connection->query($sql_query);
 
-                                        echo '      <div class="inputs">
-                                                        <label for="precio">Precio:</label>
-                                                        <br/>
-                                                        <input type="number" id="precio" name="precio">
-                                                    </div>';
+                                                // Paso 4) Comprobamos que la consulta se realizó correctamente.
+                                                if ($stmt) 
+                                                {
+                                                    /**
+                                                     *  - Cada vuelta fetch usa la conexión para retornar un registro de la tabla categorías en un array.
+                                                     *  - Este array se almacena en la variable row.
+                                                     */
+                                                    while ($categoria = $stmt->fetch()) 
+                                                    {
+                                                        // Imprimimos los valores del array.
+                                                        $selected = ($categoria['id'] == $row['Categoria']) ? ' selected' : '';
+                                                        echo '<option value="' . $categoria['id'] . '"' . $selected . '>' . $categoria['nombre'] . '</option>';
+                                                    }
+                                                }
 
-                                        echo '      <br/>';
-
-                                        echo '      <div class="inputs">
-                                                        <label for="imagen">Imagen:</label>
-                                                        <br/>
-                                                        <input type="file" id="imagen" name="imagen" accept=".jpg,.png,.gif,.jfif" />
-                                                    </div>';
-
-                                        echo '      <br/>';
-
-                                        echo '      <div class="inputs">
-                                                        <p style="margin: 0 0 0.2rem 0 ;"><b>Categoría:</b></p>
-                                                        <select name="categoria" id="categoria">';
-
-                                                            // Paso 1) Realizamos una conexión a la base de datos.
-                                                            $connection = connect_to_database();
-
-                                                            // Paso 2) Guardamos la consulta en la variable sql.
-
-                                                            $sql_query = "SELECT id, nombre FROM Categorías";
-
-                                                            // Paso 3) Ejecutamos la consulta dentro de la conexión.
-                                                            $stmt = $connection->query($sql_query);
-
-                                                            // Paso 4) Comprobamos que la consulta se realizó correctamente.
-                                                            if ($stmt) 
-                                                            {
-                                                                /**
-                                                                 *  - Cada vuelta fetch usa la conexión para retornar un registro de la tabla categorías en un array.
-                                                                 *  - Este array se almacena en la variable row.
-                                                                 */
-                                                                while ($row = $stmt->fetch()) 
-                                                                {
-                                                                    // Imprimimos los valores del array.
-                                                                    echo '<option value="' . $row['id'] . '">' . $row['nombre'] . '</option>';
-                                                                }
-                                                            } 
-                                                
-                                                            else 
-                                                            {
-                                                                // En caso de no poder mostrar las categorías lo indicamos.
-                                                                echo '<option value="null">Las categorías no están disponibles</option>';
-                                                            }
-
-                                        echo '          </select>
-                                                    </div>
-
-                                                    <br/>
-
-                                                    <input type="hidden" name="producto_id" value="' . $producto_id . '">
-
-                                                    <button type="submit">Envíar</button>
-
-                                                </form>';
-                                    } 
-                                    
-                                    else 
-                                    {
-                                        echo '<tr><td colspan="4">No se encontró el producto con el ID proporcionado.</td></tr>';
-                                    }
-                                } 
-                                
+                                // En caso de no poder mostrar las categorías lo indicamos.
                                 else 
                                 {
-                                    echo '<tr><td colspan="4">No se pudieron recuperar los datos del producto.</td></tr>';
+                                    echo '<option value="null">Las categorías no están disponibles</option>';
                                 }
+
+                                echo '
+                                    </select>
+                                    </div>
+                                    <br/>
+                                    <input type="hidden" name="producto_id" value="' . $producto_id . '">
+                                    <button type="submit">Enviar</button>
+                                </form>';
                             } 
                             
                             else 
                             {
-                                header("Location: listado_productos.php");
-                                exit;
+                                echo '<p>No se encontró el producto con el ID proporcionado.</p>';
                             }
-                        ?>
-                    </tbody>
-                </table>
+                        } 
+                        
+                        else 
+                        {
+                            echo '<p>No se pudieron recuperar los datos del producto.</p>';
+                        }
+
+                        $conn = null; // Cierra la conexión a la base de datos.
+                    } 
+                    
+                    else 
+                    {
+                        // Paso 1) Mostrar el select option dinámico con todos los productos de la base de datos.
+                        echo '<form action="' . $_SERVER['PHP_SELF'] . '" method="get"><div class="inputs"><p style="margin: 0 0 0.2rem 0 ;"><b>Selecciona un producto:</b></p><select name="id" id="id">';
+
+                        // Paso 2) Realizamos una conexión a la base de datos.
+                        $connection = connect_to_database();
+
+                        // Paso 3) Guardamos la consulta en la variable sql.
+                        $sql_query = "SELECT id, nombre FROM productos";
+
+                        // Paso 4) Ejecutamos la consulta dentro de la conexión.
+                        $stmt = $connection->query($sql_query);
+
+                        // Paso 5) Comprobamos que la consulta se realizó correctamente y imprimimos los valores del array.
+                        if ($stmt) 
+                        {
+                            while ($producto = $stmt->fetch()) 
+                            {
+                                echo '<option value="' . $producto['id'] . '">' . $producto['nombre'] . '</option>';
+                            }
+                        } 
+                        
+                        else 
+                        {
+                            // En caso de no poder mostrar los productos lo indicamos.
+                            echo '<option value="null">Los productos no están disponibles</option>';
+                        }
+
+                        echo '</select></div><br/><button type="submit">Seleccionar</button></form>';
+                    }
+                ?>
             </main>
         </div>
     </body>
+
 </html>

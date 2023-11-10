@@ -89,6 +89,9 @@
                             {
                                 echo '<tr><td colspan="4">No se pudieron recuperar los datos de los productos.</td></tr>';
                             }
+
+                            // Cierra la conexión a la base de datos.
+                            $conn = null;
                         ?>
                     </tbody>
                 </table>
