@@ -264,7 +264,7 @@
                     else 
                     {
                         // Paso 1) Mostrar el select option dinámico con todos los productos de la base de datos.
-                        echo '<form action="' . $_SERVER['PHP_SELF'] . '" method="get"><div class="inputs"><p style="margin: 0 0 0.2rem 0 ;"><b>Selecciona un producto:</b></p><select name="id" id="id">';
+                        echo '<form action="' . $_SERVER['PHP_SELF'] . '" method="get"><div class="inputs"><p style="margin: 0 0 0.2rem 0 ;"><b>Selecciona un producto:</b></p><br/><select name="id" id="id">';
 
                         // Paso 2) Realizamos una conexión a la base de datos.
                         $connection = connect_to_database();
