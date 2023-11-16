@@ -9,11 +9,13 @@
         <form action="form.php" method="post">
             <div>
                 <label for="email">Correo electrónico:</label>
+                <br/>
                 <input type="email" id="email" name="email" pattern=".+@example\.com" size="30" required />
             </div>
             <br/><br/>
             <div>
-                <label for="password"></label>
+                <label for="password">Contraseña:</label>
+                <br/>
                 <input type="password" id="password" name="password" minlength="8" maxlength="30" required />
             </div>
             <br/><br/>
