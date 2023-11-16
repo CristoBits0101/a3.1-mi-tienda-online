@@ -1,222 +1,200 @@
 <?php
 
-    // Paso 1) Importamos el archivo de configuración para poder conectarnos a la base de datos.
+    // Importación de configuraciones.
     require_once "./configuration.php";
-    
-    // Paso 2) Inicializa la variable $datosErroneos para evitar errores.
-    $datosErroneos = array();
 
-    // Paso 3) Detecta el envío de datos y llama a las validaciones.
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') validations();
+    // Comprobación de envío.
+    if ($_SERVER['REQUEST_METHOD'] === 'POST')
+        validations();
 
-    // Función de validación.
+    // Validación del formulario.
     function validations()
     {
-        // 4.1) Validación del nombre.
-        if (!isset($_POST['nombre']) || empty($_POST['nombre'])) $datosErroneos[] = "❌ El campo nombre contiene un error.";
+        // Validación de campos.
+        foreach ($_REQUEST as $field => $value)
+            if (!isset($value) || empty($value))
+                $errors = "<p>'Error en campo $field no almacenado.</p><br/>";
 
-        // 4.2) Validación del precio.
-        if (!isset($_POST['precio']) || empty($_POST['precio']) || !is_numeric($_POST['precio']) || $_POST['precio'] <= 0) $datosErroneos[] = "❌ El campo precio contiene un error.";
-
-        // 4.3) Validación de la imagen.
-        if (!isset($_FILES['imagen']) || empty($_FILES['imagen']['name'])) $datosErroneos[] = "❌ El campo imagen contiene un error.";
-
-        // 4.4) Validación del formato.
-        else
+        // Validación de ficheros.
+        foreach ($_FILES as $key => $file)
         {
-            $_photoName = $_FILES['imagen']['name'];
-            $_photoError = $_FILES['imagen']['error'];
-            $_photoSize = $_FILES['imagen']['size'];
-            $_photoMaxSize = 1024 * 1024 * 1;
-            $_photoExtension = pathinfo($_photoName, PATHINFO_EXTENSION);
-            $_photoFormats = array('jpg', 'png', 'gif', 'jfif');
+            // Validación de tipo.
+            $allowed_types = array("image/jpeg", "image/png", "image/gif");
 
-            if ($_photoError === true || $_photoSize > $_photoMaxSize || $_photoSize < 1 || !in_array($_photoExtension, $_photoFormats)) $datosErroneos[] = "❌ El formato de la imagen contiene un error.";
+            if (!in_array($file['type'], $allowed_types))
+            {
+                $errors .= "<p>Error en campo $key: Tipo de archivo no permitido.</p><br/>";
+                continue;
+            }
+
+            // Validación de tamaño.
+            $max_size = 2 * 1024 * 1024;
+
+            if ($file['size'] > $max_size)
+            {
+                $errors .= "<p>Error en campo $key: El archivo supera el tamaño permitido.</p><br/>";
+                continue;
+            }
         }
 
-        // 4.5) Validación de la categoría.
-        if (!isset($_POST['categoria']) || empty($_POST['categoria']) || !is_numeric($_POST['categoria'])) $datosErroneos[] = "❌ El campo categoría contiene un error.";
-
-        // 4.6) Si no hay datos erróneos, almacenamos los datos y se lo comunicamos al usuario.
-        if (empty($datosErroneos)) 
+        // Comprobación de errores.
+        if (empty($errors))
         {
             save_data();
-            echo "<script> alert('¡Datos almacenados correctamente!') </script>";
+            echo "<script>alert('¡Datos almacenados correctamente!')</script>";
         }
 
-        // 4.7) Si hubo errores, los mostramos y facilitamos un enlace para volver a rellenar el formulario.
-        elseif (!empty($datosErroneos))
+        // Comunicación de errores.
+        else
         {
             echo '<div id="mensajes">';
-
-                foreach ($datosErroneos as $value) {echo "<p>$value</p> <br/>";}
-
+                echo $errors;
                 echo '<a href="./crear_producto.php">Volver a rellenar formulario</a>';
-
             echo '</div>';
         }
     }
 
-    // Función almacena la imagen.
-    function store_imagen()
-    {
-        $target_dir = "ficheros\\";                                        // Directorio donde se van a guardar las imágenes.
-        $target_file = $target_dir . basename($_FILES["imagen"]["name"]);   // basename devuelve el nombre de la imagen sin el directorio.
-
-        $counter = 0;                                                       // Incrementa el nombre de la imagen.
-
-        while (file_exists($target_file)) 
-        {
-            $counter++;                                                     // Si la imagen existe, aumentar el valor de counter en 1.
-
-            $pathinfo = pathinfo($target_file);                             // Obtener la información sobre la imagen.
-
-            $name = $pathinfo["filename"];                                  // Obtener el nombre de la imagen.
-            $extension = $pathinfo["extension"];                            // Obtener la extesión de la imagen.
-    
-            $target_file =  $target_dir                                     // Directorio donde se van a guardar las imagenes.
-                            . 
-                            $name                                           // Nombre de la imagen.
-                            . 
-                            "_"                                             // Añadimos la barra baja para concatenar el número incremental.
-                            . 
-                            $counter                                        // Concatenamos el contador para diferenciar la nueva imagen de la vieja.
-                            .
-                            "."
-                            .
-                            $extension;                                     // Extensión de la imagen.
-        }
-
-        move_uploaded_file($_FILES["imagen"]["tmp_name"], $target_file);    // Movemos la imagen de la ruta temporal a la ruta de destino.
-
-        return basename($target_file);                                      // Devuelve el nombre de archivo de la imagen almacenada.
-    }
-
-    // Función intenta conectarse a la base de datos para almacenar los datos nuevos.
     function save_data()
     {
         try
         {
-            // Almacena la imagen y obtiene su nombre de archivo.
-            $imagePath = store_imagen();
+            // Obtiene image path.
+            $imagePath = image_path();
 
-            // Establece la conexión a la base de datos.
-            $conn = connect_to_database();
+            // Conecta a la base de datos.
+            $connection = connect_to_database();
 
-            // Establecemos una consulta preparada para insertar datos en la tabla 'productos'.
-            $stmt = $conn->prepare("INSERT INTO productos (Nombre, Precio, Imagen, Categoría) VALUES (:nombre, :precio, :imagen, :categoria)");
+            // Preparación de la consulta.
+            $stmt = $connection->prepare(
+                "INSERT INTO 
+                    productos (Nombre, Precio, Imagen, Categoría) 
+                VALUES 
+                    (:nombre, :precio, :imagen, :categoria)"
+            );
 
-            // Los marcadores de parámetros como :nombre, :precio, :imagen y :categoria se utilizan en lugar de valores directos para evitar la inyección SQL.
-            $stmt->bindParam(':nombre', $_POST['nombre']);         
-            $stmt->bindParam(':precio', $_POST['precio']);
+            // Purificación de datos.
+            $nombre    = filter_var($_POST['nombre'], FILTER_UNSAFE_RAW);
+            $precio    = filter_var($_POST['precio'], FILTER_VALIDATE_FLOAT);
+            $categoria = filter_var($_POST['categoria'], FILTER_UNSAFE_RAW);
+
+            // Sincronización de datos.
+            $stmt->bindParam(':nombre', $nombre);
+            $stmt->bindParam(':precio', $precio);
             $stmt->bindParam(':imagen', $imagePath);
-            $stmt->bindParam(':categoria', $_POST['categoria']);
+            $stmt->bindParam(':categoria', $categoria);
 
-            // Ejecutamos la consulta preparada para insertar los datos en la base de datos. Los valores vinculados a los marcadores de parámetros se utilizarán en la consulta.
-            $stmt->execute();
+            // Ejecución de la consulta.
+            $stmt->execute();                              
+
+            // Desplazamiento del fichero.
+            move_uploaded_file($_FILES["imagen"]["tmp_name"], $imagePath);
+
+            // Cierra la conexión.
+            $connection = null;
         }
-        
-        catch(PDOException $e)
+
+        catch (PDOException $e)
         {
             echo "Error al insertar datos: " . $e->getMessage();
         }
     }
 
-?>
+    function image_path()
+    {
+        // Carpeta de destino.
+        $target_dir  = "ficheros\\";
 
+        // Destino del fichero.
+        $target_file = $target_dir . basename($_FILES["imagen"]["name"]);
+
+        // Incrementador de nombres.
+        $increment = 0;
+
+        // Comprobación de existencia.
+        while (file_exists($target_file))
+        {
+            // Incremento de nombre.
+            $increment++;
+
+            // Datos del archivo.
+            $pathinfo  = pathinfo($target_file);
+            $name      = $pathinfo["filename"];
+            $extension = $pathinfo["extension"];
+
+            // Refactorización del nombre.
+            $target_file =  $target_dir . $name . $increment . "." . $extension;
+        }
+
+        // Retorno del path.
+        return basename($target_file);
+    }
+
+?>
 
 <!DOCTYPE html>
 <html lang="en">
-
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
         <title>Crear producto</title>
-
         <link rel="stylesheet" href="style.css">
     </head>
-
     <body>
-
-        <!-- Almacena la aplicación -->
         <div class="container">
-
-            <!-- Incluye el menú dentro de la aplicación -->
             <?php
                 include_once "./menu.php";
             ?>
-
-            <!-- Aquí va el cuerpo del contenido -->
             <main>
-
-                <!-- Se envía el formulario a sí mismo mediante el método POST y tras el envío se ejecuta la validación -->
                 <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" enctype="multipart/form-data">
-
                     <div class="inputs">
                         <label for="nombre">Nombre:</label>
                         <br/>
                         <input type="text" id="nombre" name="nombre">
                     </div>
-
                     <br/>
-
                     <div class="inputs">
                         <label for="precio">Precio:</label>
                         <br/>
                         <input type="number" id="precio" name="precio">
                     </div>
-
                     <br/>
-
                     <div class="inputs">
                         <label for="imagen">Imagen:</label>
                         <br/>
-                        <input type="file" id="imagen" name="imagen" accept=".jpg,.png,.gif,.jfif" />
+                        <input type="file" id="imagen" name="imagen" accept=".jpg,.png,.gif,.jfif"/>
                     </div>
-
                     <br/>
-
                     <div class="inputs">
                         <p style="margin: 0 0 0.2rem 0 ;"><b>Categoría:</b></p>
                         <select name="categoria" id="categoria">
                             <?php
-                                // Paso 1) Realizamos una conexión a la base de datos.
+                                // Conecta a la base de datos.
                                 $connection = connect_to_database();
 
-                                // Paso 2) Guardamos la consulta en la variable sql.
-                                $sql_query = "SELECT id, nombre FROM Categorías";
+                                // Ejecuta la consulta.
+                                $stmt = $connection->query(
+                                    "SELECT 
+                                        id, nombre 
+                                    FROM 
+                                        Categorías"
+                                );
 
-                                // Paso 3) Ejecutamos la consulta dentro de la conexión.
-                                $stmt = $connection->query($sql_query);
-
-                                // Paso 4) Comprobamos que la consulta se realizó correctamente.
-                                if ($stmt)
-                                {
-                                    /**
-                                     *  - Cada vuelta fetch usa la conexión para retornar un registro de la tabla categorías en un array.
-                                     *  - Este array se almacena en la variable row.
-                                     */
+                                // Consulta exitosa.
+                                if ($stmt) 
                                     while ($row = $stmt->fetch())
-                                    {
-                                        // Imprimimos los valores del array.
                                         echo '<option value="' . $row['id'] . '">' . $row['nombre'] . '</option>';
-                                    }
-                                }
-                                
+
+                                // Consulta no exitosa.
                                 else
-                                {
-                                    // En caso de no poder mostrar las categorías lo indicamos.
-                                    echo '<option value="null">Las categorías no están disponibles</option>';
-                                }
+                                    echo '<option value="null"> Las categorías no están disponibles </option>';
+
+                                // Cierre de conexión.
+                                $connection = null;
                             ?>
                         </select>
                     </div>
-
                     <br/>
-
                     <button type="submit">Envíar</button>
-
                 </form>
             </main>
         </div>
