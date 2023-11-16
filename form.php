@@ -14,7 +14,7 @@
         foreach ($_REQUEST as $field => $value)
             if (!isset($value) || empty($value)) 
             {
-                $_SESSION['error_messages'][$field] = 'Error en el campo $field no almacenado';
+                $_SESSION['error_messages'][$field] = "Error en el campo $field no almacenado";
                 $_error = 'login';
             }
 

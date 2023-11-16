@@ -4,10 +4,10 @@
     session_start();
 
     // Comprueba si se declararon campos con errores y los serializa.
-    function serializeError($campo) 
+    function serializeError($field) 
     {
-        if (isset($_SESSION['error_messages'][$campo]))
-            echo '<div class="error-message">' . $_SESSION['error_messages'][$campo] . '</div>';
+        if (isset($_SESSION['error_messages'][$field]))
+            echo '<div class="error-message">' . $_SESSION['error_messages'][$field] . '</div>';
     }
     
 ?>
