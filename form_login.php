@@ -4,7 +4,7 @@
     session_start();
 
     // Comprueba si se declararon campos con errores y los serializa.
-    function imprimirError($campo) 
+    function serializeError($campo) 
     {
         if (isset($_SESSION['error_messages'][$campo]))
             echo '<div class="error-message">' . $_SESSION['error_messages'][$campo] . '</div>';
@@ -43,7 +43,7 @@
                 <label for="email">Correo electrónico:</label>
                 <br/>
                 <input type="email" id="email" name="email" pattern=".+@example\.com" size="30" required />
-                <?php imprimirError('email'); ?>
+                <?php serializeError('email'); ?>
             </div>
 
             <br/><br/>
@@ -52,7 +52,7 @@
                 <label for="password">Contraseña:</label>
                 <br/>
                 <input type="password" id="password" name="password" minlength="8" maxlength="30" size="30" required />
-                <?php imprimirError('password'); ?>
+                <?php serializeError('password'); ?>
             </div>
 
             <br/><br/>
