@@ -4,34 +4,14 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Formulario de autentificación</title>
+        <style>
+            body                {display   : flex;            flex-direction: column; justify-content: center; align-items: center;}
+            h1                  {font-size : 2rem;                                                                                 }
+            form                {border    : 1px solid black; padding: 3rem;                                                       }
+            input               {margin-top: 0.5rem;                                                                               }
+            input[type="submit"]{margin-top: 0; margin: 0 auto;                                                                    }
+        </style>
     </head>
-    <style>
-        body 
-        {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        h1
-        {
-            font-size: 2rem;
-        }
-        form 
-        {
-            border: 1px solid black;
-            padding: 3rem;
-        }
-        input 
-        {
-            margin-top: 0.5rem;
-        }
-        input[type="submit"]
-        {
-            margin-top: 0;
-            margin: 0 auto;
-        }
-    </style>
     <body>
         <h1>Formulario de autentificación:</h1>
         <br/>
