@@ -16,7 +16,7 @@
             <div>
                 <label for="password">Contraseña:</label>
                 <br/>
-                <input type="password" id="password" name="password" minlength="8" maxlength="30" required />
+                <input type="password" id="password" name="password" minlength="8" maxlength="30" size="30" required />
             </div>
             <br/><br/>
             <input type="submit" value="Enviar">
