@@ -28,7 +28,9 @@
                 <input type="password" id="password" name="password" minlength="8" maxlength="30" size="30" required />
             </div>
             <br/><br/>
-            <input type="submit" value="Enviar">
+            <input type="submit" id="login" name="login" value="Entrar">
+            <br/><br/>
+            <a href="./form_register.php">Ir a registrarse</a>
         </form>
     </body>
 </html>
