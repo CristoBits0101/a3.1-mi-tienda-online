@@ -13,7 +13,7 @@
         // Validación de campos.
         foreach ($_REQUEST as $field => $value)
             if (!isset($value) || empty($value))
-                $errors = "<p>'Error en campo $field no almacenado.</p><br/>";
+                $errors = "<p>'Error en el campo $field no almacenado.</p><br/>";
 
         // Validación de ficheros.
         foreach ($_FILES as $key => $file)
