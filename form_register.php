@@ -7,7 +7,7 @@
     function serializeError($field) 
     {
         if (isset($_SESSION['error_messages'][$field]))
-            echo '<div class="error-message">' . $_SESSION['error_messages'][$field] . '</div>';
+            echo '<br/><div class="error-message">' . $_SESSION['error_messages'][$field] . '</div>';
     }
     
 ?>
