@@ -133,7 +133,7 @@
         // Registramos la password enviada.
         $password = $_POST['password'];
 
-        // Verificamos si el correo electrónico ya fue registrado.
+        // Preparamos la consulta para verificar si el correo electrónico ya fue registrado.
         $stmt = $connection->prepare(
             "SELECT
                 id
