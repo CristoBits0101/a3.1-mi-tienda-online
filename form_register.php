@@ -51,7 +51,7 @@
             <div>
                 <label for="email">Correo electrónico:</label>
                 <br/>
-                <input type="email" id="email" name="email" pattern=".+@example\.com" size="30" required />
+                <input type="email" id="email" name="email" pattern=".+@.+" size="30" required />
                 <?php serializeError('email'); ?>
             </div>
 

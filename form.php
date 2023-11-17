@@ -181,7 +181,7 @@
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
             // Insertar el nuevo usuario en la base de datos.
-            $stmt = $pdo->prepare(
+            $stmt = $connection->prepare(
                 "INSERT INTO 
                     usuarios2 (nombre, correo_electronico, contrasena_hash) 
                 VALUES 
