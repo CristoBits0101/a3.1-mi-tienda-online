@@ -10,6 +10,18 @@
             echo '<br/><div class="error-message">' . $_SESSION['error_messages'][$field] . '</div>';
     }
 
+    // 3. Verifica si no hay una sesión activa o el usuario no está autenticado.
+    if (isset($_SESSION['user_id']))
+    {
+        print "alert('Usted ya ha iniciado sesión')";
+
+        // Redirige al usuario a la página de inicio de sesión.
+        header("Location: index.php");
+
+        // Asegura que el script se detenga después de la redirección.
+        exit;
+    }
+
 ?>
 
 <!DOCTYPE html>
@@ -21,12 +33,49 @@
         <title>Formulario de autentificación</title>
 
         <style>
-            body                {   display: flex           ; flex-direction: column; justify-content: center; align-items: center;}
-            h1                  { font-size: 2rem           ;                                                                      }
-            form                {    border: 1px solid black;        padding: 3rem  ;                                              }
-            input               {margin-top: 0.5rem         ;                                                                      }
-            input[type="submit"]{margin-top: 0              ;         margin: 0 auto;                                              }
-            .error-message      {     color: red            ;                                                                      }
+            body 
+            {
+                font-family: Roboto, sans-serif;
+                font-size: 16px;
+                display: flex; 
+                flex-direction: column; 
+                justify-content: center; 
+                align-items: center;
+            }
+
+            form 
+            {
+                border: 1px solid black;
+                padding: 3rem;
+                background-color: #ffffff;
+                color: #000000;
+            }
+
+            input 
+            {
+                margin-top: 0.5rem;
+                border: 1px solid #ccc;
+                padding: 10px;
+            }
+
+            input[type="submit"] 
+            {
+                margin-top: 0;
+                margin: 0 auto;
+                background-color: #000000;
+                color: #ffffff;
+                font-size: 18px;
+            }
+
+            .error-message 
+            {
+                color: red;
+            }
+
+            .icon 
+            {
+                font-size: 16px;
+            }
         </style>
 
     </head>

@@ -202,14 +202,11 @@
             // Cerramos la conexión después de finalizar la consulta.
             $connection = null;
 
+            // Añadimos un mensaje de confirmación de registro exitoso.
+            $_SESSION['register_valid'] = '¡Usted se ha registrado correctamente, ya puede iniciar sesión si lo desea!';
+
             // Después del registro exitoso le invitamos a loguearse.
             header("Location: ./form_login.php");
-
-            // Vacía las variables de sesión.
-            session_unset();
-
-            // Destruye la sesión actual.
-            session_destroy();
 
             // Detenemos la ejecución del script para prevenir un header location en bucle en caso de error.
             exit;
