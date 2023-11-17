@@ -117,7 +117,7 @@
             $connection = null;
 
             // Usuario no encontrado.
-            $_SESSION['wrong_user']['login'] = "Error en el inicio de sesión: usuario no encontrado";
+            $_SESSION['wrong_user']['login'] = "Error en el inicio de sesión: Usuario no encontrado";
 
             // Redirigimos a la página de inicio después del inicio de sesión no exitoso.
             header("Location: ./form_login.php");
@@ -165,7 +165,7 @@
             $connection = null; 
 
             // Registramos en la variable de sesión que el correo electrónico ya registrado.
-            $_SESSION['wrong_user']['register'] = "Error en el registro: el correo electrónico ya está registrado";
+            $_SESSION['wrong_user']['register'] = "Error en el registro: El correo electrónico ya está registrado";
 
             // Redirigimos a la página de login después de comprobar que usuario ya existe.
             header("Location: ./form_login.php");
