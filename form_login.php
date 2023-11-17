@@ -13,15 +13,21 @@
     // 3. Comprueba si hubo algún error al intentar loguear al usuario.
     if (isset($_SESSION['wrong_user']['login']))
     {
-        $errorMessage = addslashes($_SESSION['wrong_user']['login']);       // Recogemos el error que trae la variable de sesión.
-        echo "<script>alert('" . $errorMessage . "');</script>";            // Alertamos sobre el error producido al intentar loguearse.
+        // Recogemos el error que trae la variable de sesión.
+        $errorMessage = addslashes($_SESSION['wrong_user']['login']);
+
+        // Alertamos sobre el error producido al intentar loguearse.
+        echo "<script>alert('" . $errorMessage . "');</script>";
     }
 
     // 4. Si el usuario ya está registrado, le decimos que inicie sesión.
     elseif (isset($_SESSION['wrong_user']['register']))
     {
-        $errorMessage = addslashes($_SESSION['wrong_user']['register']);    // Recogemos el error que trae la variable de sesión.
-        echo "<script>alert('" . $errorMessage . "');</script>";            // Alertamos sobre el error producido al intentar registrarse.
+        // Recogemos el error que trae la variable de sesión.
+        $errorMessage = addslashes($_SESSION['wrong_user']['register']);
+
+        // Alertamos sobre el error producido al intentar registrarse.
+        echo "<script>alert('" . $errorMessage . "');</script>";
     }
 
 ?>
