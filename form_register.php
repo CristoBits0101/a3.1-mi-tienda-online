@@ -10,16 +10,6 @@
             echo '<br/><div class="error-message">' . $_SESSION['error_messages'][$field] . '</div>';
     }
 
-    // 3. Comprueba si hubo algún error al intentar registrar al usuario.
-    if (isset($_SESSION['wrong_user']['login']))
-    {
-        // Recogemos el error que trae la variable de sesión.
-        $errorMessage = addslashes($_SESSION['wrong_user']['login']);
-
-        // Alertamos sobre el error producido al intentar registrar al usuario.
-        echo "<script>alert('" . $errorMessage . "');</script>";
-    }
-    
 ?>
 
 <!DOCTYPE html>
@@ -36,6 +26,7 @@
             form                {    border: 1px solid black;        padding: 3rem  ;                                              }
             input               {margin-top: 0.5rem         ;                                                                      }
             input[type="submit"]{margin-top: 0              ;         margin: 0 auto;                                              }
+            .error-message      {     color: red            ;                                                                      }
         </style>
 
     </head>
@@ -74,6 +65,11 @@
             </div>
 
             <br/><br/>
+
+            <?php
+                session_unset();    // Limpia la variable de sesión después de imprimir los errores y antes de volver a enviar el formulario.
+                session_destroy();  // Destruye la sesión actual después de imprimir los errores y antes de volver a enviar el formulario.
+            ?>
 
             <input type="submit" id="register" name="register"  value="Registrarse">
 

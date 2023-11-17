@@ -13,11 +13,15 @@
     // 3. Comprueba si hubo algún error al intentar loguear al usuario.
     if (isset($_SESSION['wrong_user']['login']))
     {
-        // Recogemos el error que trae la variable de sesión.
-        $errorMessage = addslashes($_SESSION['wrong_user']['login']);
+        $errorMessage = addslashes($_SESSION['wrong_user']['login']);       // Recogemos el error que trae la variable de sesión.
+        echo "<script>alert('" . $errorMessage . "');</script>";            // Alertamos sobre el error producido al intentar loguearse.
+    }
 
-        // Alertamos sobre el error producido al intentar loguearse.
-        echo "<script>alert('" . $errorMessage . "');</script>";
+    // 4. Si el usuario ya está registrado, le decimos que inicie sesión.
+    elseif (isset($_SESSION['wrong_user']['register']))
+    {
+        $errorMessage = addslashes($_SESSION['wrong_user']['register']);    // Recogemos el error que trae la variable de sesión.
+        echo "<script>alert('" . $errorMessage . "');</script>";            // Alertamos sobre el error producido al intentar registrarse.
     }
 
 ?>
@@ -37,7 +41,7 @@
             form                {    border: 1px solid black;        padding: 3rem  ;                                              }
             input               {margin-top: 0.5rem         ;                                                                      }
             input[type="submit"]{margin-top: 0              ;         margin: 0 auto;                                              }
-            .error-message      {     color: red;}
+            .error-message      {     color: red            ;                                                                      }
         </style>
 
     </head>
@@ -69,8 +73,8 @@
             <br/><br/>
 
             <?php
-                // Limpia la variable de sesión después de imprimir los errores y antes de volver a enviar el formulario.
-                unset($_SESSION['error_messages']);
+                session_unset();    // Limpia la variable de sesión después de imprimir los errores y antes de volver a enviar el formulario.
+                session_destroy();  // Destruye la sesión actual después de imprimir los errores y antes de volver a enviar el formulario.
             ?>
 
             <input type="submit" id="login" name="login" value="Entrar">
