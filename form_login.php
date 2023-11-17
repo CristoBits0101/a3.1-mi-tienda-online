@@ -79,8 +79,11 @@
             <br/><br/>
 
             <?php
-                session_unset();    // Limpia la variable de sesión después de imprimir los errores y antes de volver a enviar el formulario.
-                session_destroy();  // Destruye la sesión actual después de imprimir los errores y antes de volver a enviar el formulario.
+                // Limpia la variable de sesión después de imprimir los errores y antes de volver a enviar el formulario.
+                session_unset();
+
+                // Destruye la sesión actual después de imprimir los errores y antes de volver a enviar el formulario.
+                session_destroy();
             ?>
 
             <input type="submit" id="login" name="login" value="Entrar">
