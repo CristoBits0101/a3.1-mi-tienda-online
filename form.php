@@ -50,7 +50,7 @@
     elseif (empty($_SESSION['error_messages']) && isset($_POST['login']) && $_POST['login'] == 'Entrar')
     {
         // Intentamos conectarnos a la base de datos;
-        connect_to_database();
+        $connection = connect_to_database();
 
         // Registramos el email enviado.
         $email = $_POST['email'];
@@ -59,7 +59,7 @@
         $password = $_POST['password'];
 
         // Preparamos la consulta.
-        $stmt = $pdo->prepare(
+        $stmt = $connection->prepare(
             "SELECT
                 id, contrasena_hash
             FROM
@@ -80,6 +80,9 @@
             // Comprobamos la contraseña enviada.
             if (password_verify($password, $user['contrasena_hash']))
             {
+                // Cerramos la conexión después de finalizar la consulta.
+                $connection = null;
+
                 // Si la contraseña es válida, le dejamos iniciar sesión o acceder a los privilegios que solicita.
                 $_SESSION['user_id'] = $user['id'];
 
@@ -91,8 +94,11 @@
             }
 
             // En caso de que la contraseña sea incorrecta.
-            else 
+            else
             {
+                // Cerramos la conexión después de finalizar la consulta.
+                $connection = null;
+
                 // Marcamos que la contraseña introducida es incorrecta para retornarle el error al usuario.
                 $_SESSION['wrong_user']['login'] = "Error al intentar iniciar sesión: contraseña incorrecta";
 
@@ -107,6 +113,9 @@
         // Si la consulta dio error porque no se encuentra el registro del usuario.
         else 
         {
+            // Cerramos la conexión después de finalizar la consulta.
+            $connection = null;
+
             // Usuario no encontrado.
             $_SESSION['wrong_user']['login'] = "Error en el inicio de sesión: usuario no encontrado";
 
@@ -152,6 +161,9 @@
         // Si se devuelve el registro con el email enviado, quiere decir que ya está registrado en la web.
         if ($stmt->fetch(PDO::FETCH_ASSOC))
         {
+            // Cerramos la conexión después de finalizar la consulta.
+            $connection = null; 
+
             // Registramos en la variable de sesión que el correo electrónico ya registrado.
             $_SESSION['wrong_user']['register'] = "Error en el registro: el correo electrónico ya está registrado";
 
@@ -186,6 +198,9 @@
 
             // Ejecutamos la consulta.
             $stmt->execute();
+
+            // Cerramos la conexión después de finalizar la consulta.
+            $connection = null;
 
             // Después del registro exitoso le invitamos a loguearse.
             header("Location: ./form_login.php");
