@@ -1,15 +1,25 @@
 <?php
 
-    // Iniciamos sesión para ver si el formulario fue enviado previamente y contenía errores.
+    // 1. Iniciamos sesión para ver si el formulario fue enviado previamente y contenía errores.
     session_start();
 
-    // Comprueba si se declararon campos con errores y los serializa.
-    function serializeError($field) 
+    // 2. Comprueba si se declararon campos con errores y los serializa.
+    function serializeError($field)
     {
         if (isset($_SESSION['error_messages'][$field]))
             echo '<br/><div class="error-message">' . $_SESSION['error_messages'][$field] . '</div>';
     }
-    
+
+    // 3. Comprueba si hubo algún error al intentar loguear al usuario.
+    if (isset($_SESSION['wrong_user']['login']))
+    {
+        // Recogemos el error que trae la variable de sesión.
+        $errorMessage = addslashes($_SESSION['wrong_user']['login']);
+
+        // Alertamos sobre el error producido al intentar loguearse.
+        echo "<script>alert('" . $errorMessage . "');</script>";
+    }
+
 ?>
 
 <!DOCTYPE html>
