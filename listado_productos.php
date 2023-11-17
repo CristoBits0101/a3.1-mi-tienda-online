@@ -53,22 +53,22 @@
                             $conn = connect_to_database();
 
                             // Realiza una consulta SQL para obtener los datos de la tabla 'productos' con un JOIN en 'Categorías'.
-                            $sql = "SELECT     
-                                        productos.Nombre, 
-                                        productos.Precio, 
-                                        productos.Imagen, 
-                                        Categorías.nombre 
-                                    AS         
-                                        CategoriaNombre, 
-                                        productos.id 
-                                    FROM       
-                                        productos 
-                                    INNER JOIN 
-                                        Categorías 
-                                    ON         
-                                        productos.Categoría = Categorías.id";
-
-                            $stmt = $conn->query($sql);
+                            $stmt = $conn->query(
+                                "SELECT     
+                                    productos.Nombre, 
+                                    productos.Precio, 
+                                    productos.Imagen, 
+                                    Categorías.nombre 
+                                AS         
+                                    CategoriaNombre, 
+                                    productos.id 
+                                FROM       
+                                    productos
+                                INNER JOIN 
+                                    Categorías 
+                                ON         
+                                    productos.Categoría = Categorías.id"
+                            );
 
                             if ($stmt) 
                             {

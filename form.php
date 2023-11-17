@@ -49,6 +49,9 @@
     // 3.2. Si no hay errores y el formulario enviado pertenece a login, intentamos autenticar al usuario.
     elseif (empty($_SESSION['error_messages']) && isset($_POST['login']) && $_POST['login'] == 'Entrar')
     {
+        // Intentamos conectarnos a la base de datos;
+        connect_to_database();
+
         // Registramos el email enviado.
         $email = $_POST['email'];
 
@@ -118,6 +121,9 @@
     // 3.3. Si no hay errores y el formulario enviado pertenece a register, intentamos registrar al nuevo usuario.
     elseif (empty($_SESSION['error_messages']) && isset($_POST['register']) && $_POST['register'] == 'Registrarse')
     {
+        // Intentamos conectarnos a la base de datos;
+        $connection = connect_to_database();
+
         // Registramos el nombre enviado.
         $name = $_POST['name'];
 
@@ -128,7 +134,7 @@
         $password = $_POST['password'];
 
         // Verificamos si el correo electrónico ya fue registrado.
-        $stmt = $pdo->prepare(
+        $stmt = $connection->prepare(
             "SELECT
                 id
             FROM
