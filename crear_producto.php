@@ -154,7 +154,12 @@
         <title>Crear producto</title>
         <link rel="stylesheet" href="style.css">
     </head>
-    <body>
+    <body
+        <?php 
+            if (isset($_COOKIE['color_fondo']) && !empty($_COOKIE['color_fondo']))
+                echo 'style="background-color: ' . $_COOKIE['color_fondo'] . '"';
+        ?>
+    >
         <div class="container">
             <?php
                 include_once "./menu.php";

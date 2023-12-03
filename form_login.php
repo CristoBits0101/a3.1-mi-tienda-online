@@ -50,6 +50,26 @@
     if (isset($_SESSION['register_valid']))
         echo "<script>alert('¡Usted se ha registrado correctamente, ya puede iniciar sesión si lo desea!')</script>";
 
+    // 8. Verifica sí el usuario ha intentado entrar a la aplicación más de tres veces y lo bloquea durante 3 minutos.
+    if (isset($_COOKIE['errores_login']) && !empty($_COOKIE['errores_login']) && $_COOKIE['errores_login'] < 2) 
+    {
+        echo "<script>alert('Después de 5 inicios de sesión erróneos, se le impedirá iniciar sesión a la aplicación desde ese navegador durante 3 minutos.');</script>";
+        echo "<p>Intentos erroneos: " . $_COOKIE['errores_login'] . "</p>";
+    }
+
+    // 9. Verificar si el usuario ha intentado entrar a la aplicación más de tres veces y bloquearlo durante 3 minutos.
+    elseif (isset($_COOKIE['errores_login']) && !empty($_COOKIE['errores_login']))
+    {
+        // La cookie "bloqueo_login" expira en 3 minutos.
+        setcookie('bloqueo_login', true, time() + 180, '/');
+
+        // Mostrar el mensaje de alerta.
+        echo "<script>alert('Después de 5 inicios de sesión erróneos, se le impedirá iniciar sesión a la aplicación desde ese navegador durante 3 minutos.');</script>";
+
+        // También puedes redirigir al usuario o mostrar un mensaje en HTML según tus necesidades.
+        echo "<p>Intentos erróneos: " . $_COOKIE['errores_login'] . "</p>";
+    }
+
 ?>
 
 <!DOCTYPE html>
@@ -109,7 +129,12 @@
 
     </head>
 
-    <body>
+    <body
+        <?php 
+            if (isset($_COOKIE['color_fondo']) && !empty($_COOKIE['color_fondo']))
+                echo 'style="background-color: ' . $_COOKIE['color_fondo'] . '"';
+        ?>
+    >
 
         <h1>Formulario de autentificación:</h1>
 
@@ -143,7 +168,12 @@
                 session_destroy();
             ?>
 
-            <input type="submit" id="login" name="login" value="Entrar">
+            <?php
+                if (isset($_COOKIE['bloqueo_login']) && !empty(($_COOKIE['bloqueo_login'])) && $_COOKIE['bloqueo_login'] == true)
+                    echo "¡Envío de formulario bloqueado!";
+                else
+                    echo "<input type='submit' id='login' name='login' value='Entrar'>";
+            ?>
 
             <br/><br/>
 

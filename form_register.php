@@ -80,7 +80,12 @@
 
     </head>
 
-    <body>
+    <body
+        <?php 
+            if (isset($_COOKIE['color_fondo']) && !empty($_COOKIE['color_fondo']))
+                echo 'style="background-color: ' . $_COOKIE['color_fondo'] . '"';
+        ?>
+    >
 
         <h1>Formulario de registro:</h1>
 
@@ -111,6 +116,14 @@
                 <br/>
                 <input type="password" id="password" name="password" minlength="8" maxlength="30" size="30" required />
                 <?php serializeError('password'); ?>
+            </div>
+
+            <br/><br/>
+
+            <div>
+                <label for="body">Color de fondo:</label>
+                <br/>
+                <input type="color" id="body" name="body" value="#DCDBD9" />
             </div>
 
             <br/><br/>

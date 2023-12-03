@@ -33,6 +33,10 @@
     }
 </script>
 <header>
+    <?php 
+        if (isset($_SESSION['name']) && !empty($_SESSION['name']))
+            echo "<p> Sesión iniciada como: " . $_SESSION['name'] . "</p>";
+    ?>
     <h1>Tienda on-line</h1>
     <nav>
         <ul>

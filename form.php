@@ -61,7 +61,7 @@
         // Preparamos la consulta.
         $stmt = $connection->prepare(
             "SELECT
-                id, contrasena_hash
+                id, nombre, contrasena_hash, color_fondo
             FROM
                 usuarios2
             WHERE
@@ -85,6 +85,10 @@
 
                 // Si la contraseña es válida, le dejamos iniciar sesión o acceder a los privilegios que solicita.
                 $_SESSION['user_id'] = $user['id'];
+                $_SESSION['name'] = $user['nombre'];
+
+                // Si el usuario se loguea correctamente guardamos el color de fondo en la cookie.
+                setcookie('color_fondo', $user['color_fondo'], time() + 86000);
 
                 // Redirigimos a la página de inicio después del inicio de sesión exitoso.
                 header("Location: ./index.php");
@@ -102,6 +106,17 @@
                 // Marcamos que la contraseña introducida es incorrecta para retornarle el error al usuario.
                 $_SESSION['wrong_user']['login'] = "Error al intentar iniciar sesión: contraseña incorrecta";
 
+                // Verificar si la cookie "errores_login" existe.
+                if (isset($_COOKIE['errores_login']) && !empty($_COOKIE['errores_login']))
+                {
+                    // Si la cookie ya existe, incrementamos su valor en 1, y la volvemos a crear para que se actualice inmediatamente.
+                    $erroresLogin = $_COOKIE['errores_login'] + 1;
+                    setcookie('errores_login', $erroresLogin, 0, '/');
+                }
+                else 
+                    // Si no existe, establecer el valor en 1, 0 que no caduca y la barra '/' que está disponible en todo el dominio.
+                    setcookie('errores_login', 1, 0, '/');
+
                 // Redirigimos a la página de inicio después del inicio de sesión no exitoso.
                 header("Location: ./form_login.php");
 
@@ -118,6 +133,20 @@
 
             // Usuario no encontrado.
             $_SESSION['wrong_user']['login'] = "Error en el inicio de sesión: Usuario no encontrado";
+
+            // Verificar si la cookie "errores_login" existe.
+            if (isset($_COOKIE['errores_login']) && !empty($_COOKIE['errores_login']))
+            {
+                // Si la cookie ya existe, incrementamos su valor en 1, y la volvemos a crear para que se actualice inmediatamente.
+                $erroresLogin = $_COOKIE['errores_login'] + 1;
+                setcookie('errores_login', $erroresLogin, 0, '/');
+            }
+            else 
+                // Si no existe, establecer el valor en 1, 0 que no caduca y la barra '/' que está disponible en todo el dominio.
+                setcookie('errores_login', 1, 0, '/');
+
+            // Acceder directamente al valor actualizado de la cookie.
+            $erroresLogin = $_COOKIE['errores_login'];
 
             // Redirigimos a la página de inicio después del inicio de sesión no exitoso.
             header("Location: ./form_login.php");
@@ -183,7 +212,7 @@
             // Insertar el nuevo usuario en la base de datos.
             $stmt = $connection->prepare(
                 "INSERT INTO 
-                    usuarios2 (nombre, correo_electronico, contrasena_hash) 
+                    usuarios2 (nombre, correo_electronico, contrasena_hash, color_fondo) 
                 VALUES 
                     (:name, :email, :hashedPassword)");
 

@@ -31,7 +31,12 @@
         <link rel="stylesheet" href="style.css">
     </head>
 
-    <body>
+    <body
+        <?php 
+            if (isset($_COOKIE['color_fondo']) && !empty($_COOKIE['color_fondo']))
+                echo 'style="background-color: ' . $_COOKIE['color_fondo'] . '"';
+        ?>
+    >
 
         <!-- Almacena la aplicación -->
         <div class="container">
